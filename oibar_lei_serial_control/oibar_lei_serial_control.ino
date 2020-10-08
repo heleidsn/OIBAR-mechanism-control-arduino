@@ -1,18 +1,21 @@
 /*
- * OIBAR end-effector RC radio control
+ * OIBAR end-effector serial control
  * Lei He
  * control actuator in and out using : AC1_IN AC1_OUT AC2_IN AC2_OUT
  * 13 Aug 2020
  * Change log:
  * V1.1: 09 Sep 2020 
  *       Add delay funciton for the linear actuator
+ *       07 Oct 2020
+ *       change ACTUATOR1_POS_OUT from 115 to 125
+ *       remove the init AC1 in slowly
  */
 #include <Servo.h>
 #include <AFMotor.h>
 
 Servo linear_actuator;  // create servo object to control a servo
 int ACTUATOR1_POS_IN = 0;    // degrees for normal servo
-int ACTUATOR1_POS_OUT = 115; // degrees for normal servo
+int ACTUATOR1_POS_OUT = 125; // degrees for normal servo
 
 int ACTUATOR2_STEPS = 270;
 
@@ -40,11 +43,15 @@ void setup() {
 
   // actuator 1
   linear_actuator.attach(9, 1000, 2000); // attaches the servo on pin 9 to the servo object
-  // linear_actuator.write(ACTUATOR1_POS_IN); // move actuator1 to in position
-  for (pos = ACTUATOR1_POS_OUT; pos >= 0; pos -= 1){
-          linear_actuator.write(pos);
-          delay(50);
-        }
+  
+  // AC1 init method 1: write pose_in directly
+  linear_actuator.write(ACTUATOR1_POS_IN); // move actuator1 to in position
+  
+  // AC1 init method 2: recover from any position (PS: sometimes method 1 doesn't work...)
+  // for (pos = ACTUATOR1_POS_OUT; pos >= 0; pos -= 1){
+  //         linear_actuator.write(pos);
+  //         delay(50);
+  //       }
 
   // actuator 2 stepper motor
   stepper_motor.setSpeed(40);
